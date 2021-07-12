@@ -1,5 +1,5 @@
 # SpriteSheatMaker
-A siple python Sprite sheat maker.
+A simple python Sprite sheat maker.
 
 Made this for my need in one day.
 
