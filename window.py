@@ -1,6 +1,7 @@
 import json
 import tkinter as tk
 import yaml
+import re
 from tkinter.filedialog import askopenfilename, asksaveasfilename, askopenfilenames
 from PIL import Image
 from tkscrolledframe import ScrolledFrame
@@ -11,10 +12,10 @@ class Window:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title('Sprite Sheet Maker')
-        self.root.geometry("480x480")
+        self.root.geometry("1280x680")
         self.root.resizable(width=True, height=True)
 
-        sf = ScrolledFrame(self.root, width=640, height=480)
+        sf = ScrolledFrame(self.root, width=680, height=680)
         sf.pack(side="top", expand=1, fill="both")
         sf.bind_arrow_keys(self.root)
         sf.bind_scroll_wheel(self.root)
@@ -35,16 +36,19 @@ class Window:
         self.savYaml = tk.Button(self.innerFrame, command=self.save_yaml, text='Export yaml or json!')
         self.view = tk.Button(self.innerFrame, command=self.view_image, text='view')
 
-        self.buttonadd.grid(row=self.ofset, column=0, columnspan=2, sticky=tk.W)
-        self.addMultiple.grid(row=self.ofset, column=2, columnspan=2, sticky=tk.W)
-        self.update.grid(row=self.ofset, column=4, columnspan=2, sticky=tk.W)
-        self.save.grid(row=self.ofset + 1, column=0, columnspan=2, sticky=tk.W)
-        self.savYaml.grid(row=self.ofset + 1, column=2, columnspan=2, sticky=tk.W)
-        self.view.grid(row=self.ofset + 1, column=4, columnspan=2, sticky=tk.W)
+        self.buttonadd.grid(row=self.ofset, column=0, columnspan=2)
+        self.addMultiple.grid(row=self.ofset, column=4, columnspan=2)
+        self.update.grid(row=self.ofset, column=8, columnspan=2)
 
+        self.save.grid(row=self.ofset + 1, column=0, columnspan=2)
+        self.savYaml.grid(row=self.ofset + 1, column=4, columnspan=2)
+        self.view.grid(row=self.ofset + 1, column=8, columnspan=2)
         self.currentDir = r"/"
 
         self.rowAdded = 0
+
+        self.lastNumberInFile = None
+        self.row = 0
 
     def view_image(self):
         newImg = self._proses_img()
@@ -67,49 +71,63 @@ class Window:
     def _add_row(self, imgLoc):
         self.update_buttons_locatons()
 
-        e1 = tk.Entry(self.innerFrame, width=5)
-        e1.insert(0, 0)
-        e1.grid(row=self.rowAdded, column=0)
 
+
+
+        numberInTheFileName = (re.search(r'\d+', imgLoc.split(r'/')[-1]).group())
+        if self.lastNumberInFile == numberInTheFileName:
+            self.row += 1
+
+        if self.lastNumberInFile is None:
+            self.lastNumberInFile = numberInTheFileName
+
+        row = tk.Label(self.innerFrame, text='row')
+        e1 = tk.Entry(self.innerFrame, width=5)
+        e1.insert(0, self.row)
+        row.grid(row=self.rowAdded, column=0)
+        e1.grid(row=self.rowAdded, column=1)
+
+        col = tk.Label(self.innerFrame, text='col')
         e2 = tk.Entry(self.innerFrame, width=5)
-        e2.insert(0, 0)
-        e2.grid(row=self.rowAdded, column=1)
+        e2.insert(0, numberInTheFileName)
+        col.grid(row=self.rowAdded, column=2)
+        e2.grid(row=self.rowAdded, column=3)
 
         e3 = tk.Entry(self.innerFrame, width=len(imgLoc))
         e3.insert(0, imgLoc)
-        e3.grid(row=self.rowAdded, column=2, columnspan=3)
+        e3.grid(row=self.rowAdded, column=4, columnspan=3)
 
         l1 = tk.Label(self.innerFrame, text='x')
         e4 = tk.Entry(self.innerFrame, width=5)
         e4.insert(0, 0)
-        l1.grid(row=self.rowAdded, column=6)
-        e4.grid(row=self.rowAdded, column=7)
+        l1.grid(row=self.rowAdded, column=8)
+        e4.grid(row=self.rowAdded, column=9)
 
         e5 = tk.Entry(self.innerFrame, width=5)
         e5.insert(0, 0)
-        e5.grid(row=self.rowAdded, column=8)
+        e5.grid(row=self.rowAdded, column=10)
 
         l2 = tk.Label(self.innerFrame, text='y')
         e6 = tk.Entry(self.innerFrame, width=5)
         e6.insert(0, 0)
-        l2.grid(row=self.rowAdded, column=9)
-        e6.grid(row=self.rowAdded, column=10)
+        l2.grid(row=self.rowAdded, column=11)
+        e6.grid(row=self.rowAdded, column=12)
 
         e7 = tk.Entry(self.innerFrame, width=5)
         e7.insert(0, 0)
-        e7.grid(row=self.rowAdded, column=11)
+        e7.grid(row=self.rowAdded, column=13)
 
         b = tk.Button(self.innerFrame, text='pop', command=partial(self.remove_row, self.rowAdded), font=('Helvetica', '7'), width=5)
-        b.grid(row=self.rowAdded, column=12)
+        b.grid(row=self.rowAdded, column=14)
 
         l3 = tk.Label(self.innerFrame, text="saprate frame")
         ind = tk.Entry(self.innerFrame, width=30)
         ind.insert(0, "frame")
-        l3.grid(row=self.rowAdded, column=13)
-        ind.grid(row=self.rowAdded, column=14)
+        l3.grid(row=self.rowAdded, column=15)
+        ind.grid(row=self.rowAdded, column=16)
 
 
-        self.controlers[self.rowAdded] = [e1, e2, imgLoc, e4, e5, e6, e7, e3, l1, l2, l3, b, ind]
+        self.controlers[self.rowAdded] = [e1, e2, imgLoc, e4, e5, e6, e7, e3, l1, l2, l3, row, b, ind]
         self.rowAdded += 1
 
     def remove_row(self, row):
@@ -120,12 +138,13 @@ class Window:
 
     def update_buttons_locatons(self):
         self.ofset += 1
-        self.buttonadd.grid(row=self.ofset, column=0, columnspan=2, sticky=tk.W)
-        self.addMultiple.grid(row=self.ofset, column=2, columnspan=2, sticky=tk.W)
-        self.update.grid(row=self.ofset, column=4, columnspan=2, sticky=tk.W)
-        self.save.grid(row=self.ofset + 1, column=0, columnspan=2, sticky=tk.W)
-        self.savYaml.grid(row=self.ofset + 1, column=2, columnspan=2, sticky=tk.W)
-        self.view.grid(row=self.ofset + 1, column=4, columnspan=2, sticky=tk.W)
+        self.buttonadd.grid(row=self.ofset, column=0, columnspan=5,)
+        self.addMultiple.grid(row=self.ofset, column=4, columnspan=5)
+        self.update.grid(row=self.ofset, column=8, columnspan=5)
+
+        self.save.grid(row=self.ofset + 1, column=0, columnspan=5)
+        self.savYaml.grid(row=self.ofset + 1, column=4, columnspan=5)
+        self.view.grid(row=self.ofset + 1, column=8, columnspan=5)
 
     def update_cells(self):
         self.indent.clear()
