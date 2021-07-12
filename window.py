@@ -24,6 +24,7 @@ class Window:
         self.ofset = 0
 
         self.controlers: dict[int: list[tk.Entry]] = {}
+        self.indent = []
 
         self.saveW, self.savaH = 0, 0
 
@@ -101,7 +102,14 @@ class Window:
         b = tk.Button(self.innerFrame, text='pop', command=partial(self.remove_row, self.rowAdded), font=('Helvetica', '7'), width=5)
         b.grid(row=self.rowAdded, column=12)
 
-        self.controlers[self.rowAdded] = [e1, e2, imgLoc, e4, e5, e6, e7, e3, l1, l2, b]
+        l3 = tk.Label(self.innerFrame, text="saprate frame")
+        ind = tk.Entry(self.innerFrame, width=30)
+        ind.insert(0, "frame")
+        l3.grid(row=self.rowAdded, column=13)
+        ind.grid(row=self.rowAdded, column=14)
+
+
+        self.controlers[self.rowAdded] = [e1, e2, imgLoc, e4, e5, e6, e7, e3, l1, l2, l3, b, ind]
         self.rowAdded += 1
 
     def remove_row(self, row):
@@ -120,6 +128,7 @@ class Window:
         self.view.grid(row=self.ofset + 1, column=4, columnspan=2, sticky=tk.W)
 
     def update_cells(self):
+        self.indent.clear()
         for row in self.controlers.values():
             imgRow = row[0]
             imgCol = row[1]
@@ -131,6 +140,8 @@ class Window:
 
             yStart = row[5]
             yEnd = row[6]
+
+            self.indent.append(row[-1].get())
 
             img = Image.open(img)
             width, height = img.size
@@ -153,7 +164,7 @@ class Window:
             if int(xEnd.get()) > self.saveW:
                 self.saveW = int(xEnd.get())
 
-        print(self.savaH, self.saveW)
+        print(self.savaH, self.saveW, self.indent)
 
     def _proses_img(self):
         self.update_cells()
@@ -191,12 +202,13 @@ class Window:
     def save_yaml(self):
         self.update_cells()
         print('saveing')
-        ymalfile = {}
+        ymalfile = {non: {} for non in self.indent}
+
         for i, row in enumerate(self.controlers.values()):
             # imgRow = row[0]
             # imgCol = row[1]
 
-            img = row[2]
+            img = row[2].split(r'/')[-1]
 
             xStart = row[3]
             xEnd = row[4]
@@ -204,32 +216,25 @@ class Window:
             yStart = row[5]
             yEnd = row[6]
 
-            ymalfile[f"{img}{i}"] = {
-                    'x': [xStart.get(), xEnd.get()],
-                    'y': [yStart.get(), yEnd.get()]
-                 }
+            ymalfile[row[-1].get()][f"{img}{i}"] = {
+                'x': [xStart.get(), xEnd.get()],
+                'y': [yStart.get(), yEnd.get()]
+            }
+
+
+
+
 
         print(ymalfile)
-        saveimgLoc:str = asksaveasfilename(
+        saveimgLoc: str = asksaveasfilename(
             initialfile="Untitle.yaml",
             defaultextension=".yaml",
             filetypes=[("All files", "*.*"),
                        ("YAML files", "*.yaml"),
                        ("JSON files", "*.json")])
 
-
-
         with open(saveimgLoc, "w") as f:
             if saveimgLoc.endswith(".yaml"):
                 yaml.dump(ymalfile, f, default_flow_style=None)
             else:
                 json.dump(ymalfile, f, ensure_ascii=False, indent=4)
-
-
-
-
-
-
-
-
-
