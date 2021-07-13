@@ -1,5 +1,5 @@
 # SpriteSheetMaker
-A simple python Sprite sheet maker. It takes saparet images and plans them on a new image. Can also export json and yaml files.
+A simple python Sprite sheet maker. It takes separate images and plans them on a new image. Can also export json and yaml files.
 
 Made this for my need in one day.
 
@@ -26,7 +26,7 @@ The y is corresponding for height.
 
 ### EXAMPLE:
 
-##### The imge below will produse ymal file:
+##### The image below will produce this yaml file:
 
 
 ![image](https://user-images.githubusercontent.com/59426055/125518713-f3f960ae-23ca-468c-bcfc-29dbfe647089.png)
