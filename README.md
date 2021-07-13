@@ -1,5 +1,5 @@
 # SpriteSheetMaker
-A simple python Sprite sheet maker.
+A simple python Sprite sheet maker. It takes saparet images and plans them on a new image. Can also export json and yaml files.
 
 Made this for my need in one day.
 
@@ -8,17 +8,29 @@ Maybe will update it in the future
 ![image](https://user-images.githubusercontent.com/59426055/125518065-cddf3792-cf36-4d44-a761-4b3b562d3830.png)
 
 
-# USEGE
+## USEGE:
 
-Edint the row, col and separate frames.
+Edit the row, col and separate frames (frames).
+Row is the row of with the image will be placed on the imag, col is for the corresponding column.
+Separate frames (frames) is for the nested dict/json/yaml.
 
-Row is the row of with the image will be placed and col is for the coressponding column.
+The other fields are auto generated.
 
-Separate frames (frames) is for the nested dict/json/yaml
+The x entry is width position and width position plus with of image. It is created by taking the row entry.
+The y is corresponding for height.
 
-EXAMPLE:
+
+|  _ |   _                            |        _        |   _  |        _                  | _
+--- | ---                           | ---            |---  | ---                      | ---
+| x |  \<number in row\> * img.width  | x + img.width  |   y | \<number in col\> * height | y + img.height |
+
+### EXAMPLE:
+
+##### The imge below will produse ymal file:
+
+
 ![image](https://user-images.githubusercontent.com/59426055/125518713-f3f960ae-23ca-468c-bcfc-29dbfe647089.png)
-This will produse ymal file:
+
 ```yaml
 Bandit_Idle_1_n0:
   Bandit_Idle_1.png0:
@@ -54,9 +66,11 @@ Bandit_Walk_4_n1:
     y: ['32', '64']
 ```
 
+##### This will produse:
+
 ![image](https://user-images.githubusercontent.com/59426055/125518916-53430e84-a8a9-4d18-bdde-4a693536e5dc.png)
 
-This will produse:
+
 ```yaml
 frame1:
   Bandit_Idle_1.png0:
