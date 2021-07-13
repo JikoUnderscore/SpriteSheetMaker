@@ -1,4 +1,5 @@
 import json
+import sys
 import tkinter as tk
 import yaml
 import re
@@ -57,8 +58,8 @@ class Window:
 
     def add_rows(self):
         filez = askopenfilenames(title='Choose a file')
-        print(filez)
-        print(len(filez))
+        # print(filez)
+        # print(len(filez))
         for path in filez:
             self._add_row(path)
 
@@ -71,7 +72,9 @@ class Window:
 
     def _add_row(self, imgLoc):
         self.update_buttons_locatons()
-        numberInTheFileName = (re.search(r'\d+', imgLoc.split(r'/')[-1]).group())
+
+        fileName = imgLoc.split(r'/')[-1]
+        numberInTheFileName = (re.search(r'\d+', fileName).group())
         if self.lastNumberInFile == numberInTheFileName:
             self.row += 1
 
@@ -119,7 +122,7 @@ class Window:
 
         l3 = tk.Label(self.innerFrame, text="saprate frame")
         ind = tk.Entry(self.innerFrame, width=30)
-        ind.insert(0, f"frame{self.row}")
+        ind.insert(0, f"{fileName.split('.')[0]}_n{self.row}")
         l3.grid(row=self.rowAdded, column=15)
         ind.grid(row=self.rowAdded, column=16)
 
@@ -181,7 +184,7 @@ class Window:
             if int(xEnd.get()) > self.saveW:
                 self.saveW = int(xEnd.get())
 
-        print(self.savaH, self.saveW, self.indent)
+        # print(self.savaH, self.saveW, self.indent)
 
     def _proses_img(self):
         self.update_cells()
@@ -218,7 +221,7 @@ class Window:
 
     def save_yaml(self):
         self.update_cells()
-        print('saveing')
+        # print('saveing')
         ymalfile = {non: {} for non in self.indent}
 
         for i, row in enumerate(self.controlers.values()):
@@ -239,10 +242,7 @@ class Window:
             }
 
 
-
-
-
-        print(ymalfile)
+        # print(ymalfile)
         saveimgLoc: str = asksaveasfilename(
             initialfile="Untitle.yaml",
             defaultextension=".yaml",
@@ -268,7 +268,7 @@ class MenuBar:
         file = tk.Menu(menubar, tearoff=0)
         file.add_command(label='Save to VSC', command=self.seve_table)
         file.add_separator()
-        file.add_command(label="Exit", command=quit)
+        file.add_command(label="Exit", command=sys.exit)
 
         menubar.add_cascade(label="File", menu=file)
 
@@ -298,7 +298,7 @@ class MenuBar:
         windowObj.root.bind('<F5>', lambda x: windowObj.update_cells())
 
     def seve_table(self):
-        print('savein tabel')
+        # print('savein tabel')
         saveFileName = asksaveasfilename(
             initialfile="Untitle.csv",
             defaultextension=".csv",
@@ -317,7 +317,7 @@ class MenuBar:
                 sprFrame = row[-1].get()
 
 
-                print(rCol, rRow, filepath, sprFrame)
+                # print(rCol, rRow, filepath, sprFrame)
 
                 sf.write(f'{rCol},{rRow},"{filepath}",{sprFrame}\n')
 
