@@ -124,7 +124,7 @@ class Window:
         ind.grid(row=self.rowAdded, column=16)
 
 
-        self.controlers[self.rowAdded] = [e1, e2, imgLoc, e4, e5, e6, e7, e3, l1, l2, l3, row, b, ind]
+        self.controlers[self.rowAdded] = [e1, e2, imgLoc, e4, e5, e6, e7, e3, l1, l2, l3, row, col, b, ind]
         self.rowAdded += 1
 
     def remove_row(self, row):
