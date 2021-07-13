@@ -20,7 +20,7 @@ F5 = updates 'x' and 'y' cells.
 
 ***
 
-'row' is the row of with the image will be placed on the image, 'col' is for the corresponding column.  
+'row' is the rows of images, 'col' is for the corresponding columns.  
 Separate frames (frames) is for the nested dict/json/yaml.
 
 The other fields are auto generated.
