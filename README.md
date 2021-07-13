@@ -25,7 +25,7 @@ Separate frames (frames) is for the nested dict/json/yaml.
 
 The other fields are auto generated.
 
-The 'x' cells is width position and width position plus with of image. It is created by taking the row entry.
+The 'x' cells is width position and width position plus with of image. It is created by taking the 'row' cells.
 The 'y' is corresponding for height.
 
 |  _ |   _                            |        _        |   _  |        _                  | _
