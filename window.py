@@ -17,7 +17,7 @@ class Window:
 
         sf = ScrolledFrame(self.root, width=680, height=680)
         sf.pack(side="top", expand=1, fill="both")
-        sf.bind_arrow_keys(self.root)
+        # sf.bind_arrow_keys(self.root)
         sf.bind_scroll_wheel(self.root)
 
         self.innerFrame = sf.display_widget(tk.Frame)
@@ -29,12 +29,12 @@ class Window:
 
         self.saveW, self.savaH = 0, 0
 
-        self.buttonadd = tk.Button(self.innerFrame, command=self.add_row, text='ADdd')
+        self.buttonadd = tk.Button(self.innerFrame, command=self.add_row, text='Add one row')
         self.addMultiple = tk.Button(self.innerFrame, command=self.add_rows, text='Add rows')
         self.update = tk.Button(self.innerFrame, command=self.update_cells, text='Update')
-        self.save = tk.Button(self.innerFrame, command=self.save_img, text='save!')
+        self.save = tk.Button(self.innerFrame, command=self.save_img, text='Save image!')
         self.savYaml = tk.Button(self.innerFrame, command=self.save_yaml, text='Export yaml or json!')
-        self.view = tk.Button(self.innerFrame, command=self.view_image, text='view')
+        self.view = tk.Button(self.innerFrame, command=self.view_image, text='View')
 
         self.buttonadd.grid(row=self.ofset, column=0, columnspan=2)
         self.addMultiple.grid(row=self.ofset, column=4, columnspan=2)
@@ -49,6 +49,7 @@ class Window:
 
         self.lastNumberInFile = None
         self.row = 0
+        self.mb = MenuBar(self)
 
     def view_image(self):
         newImg = self._proses_img()
@@ -66,14 +67,10 @@ class Window:
         if imgLoc != "":
             self.currentDir = imgLoc
 
-        self._add_row(imgLoc)
+            self._add_row(imgLoc)
 
     def _add_row(self, imgLoc):
         self.update_buttons_locatons()
-
-
-
-
         numberInTheFileName = (re.search(r'\d+', imgLoc.split(r'/')[-1]).group())
         if self.lastNumberInFile == numberInTheFileName:
             self.row += 1
@@ -122,7 +119,7 @@ class Window:
 
         l3 = tk.Label(self.innerFrame, text="saprate frame")
         ind = tk.Entry(self.innerFrame, width=30)
-        ind.insert(0, "frame")
+        ind.insert(0, f"frame{self.row}")
         l3.grid(row=self.rowAdded, column=15)
         ind.grid(row=self.rowAdded, column=16)
 
@@ -148,6 +145,7 @@ class Window:
 
     def update_cells(self):
         self.indent.clear()
+        self.saveW, self.savaH = 0, 0
         for row in self.controlers.values():
             imgRow = row[0]
             imgCol = row[1]
@@ -257,3 +255,72 @@ class Window:
                 yaml.dump(ymalfile, f, default_flow_style=None)
             else:
                 json.dump(ymalfile, f, ensure_ascii=False, indent=4)
+
+
+
+class MenuBar:
+    def __init__(self, windowObj: Window):
+        menubar = tk.Menu(windowObj.root)
+        windowObj.root.config(menu=menubar)
+
+        self.rows = windowObj.controlers
+
+        file = tk.Menu(menubar, tearoff=0)
+        file.add_command(label='Save to VSC', command=self.seve_table)
+        file.add_separator()
+        file.add_command(label="Exit", command=quit)
+
+        menubar.add_cascade(label="File", menu=file)
+
+        editmenu = tk.Menu(menubar, tearoff=0)
+        editmenu.add_command(label="Cut", accelerator="Ctrl+X", command=lambda: windowObj.root.focus_get().event_generate('<<Cut>>'))
+        editmenu.add_command(label="Copy", accelerator="Ctrl+C", command=lambda: windowObj.root.focus_get().event_generate('<<Copy>>'))
+        editmenu.add_command(label="Paste", accelerator="Ctrl+V", command=lambda: windowObj.root.focus_get().event_generate('<<Paste>>'))
+        editmenu.add_command(label="Select all", accelerator="Ctrl+A", command=lambda: windowObj.root.focus_get().event_generate('<<SelectAll>>'))
+        editmenu.add_separator()
+        # editmenu.add_command(label="Undo", accelerator="Ctrl+Z", command=rodi.ent_txt.edit_undo)
+        # editmenu.add_command(label="Redo", accelerator="Ctrl+Y", command=rodi.ent_txt.edit_redo)
+        menubar.add_cascade(label="Edit", menu=editmenu)
+
+        options = tk.Menu(menubar, tearoff=0)
+        options.add_command(label='Add one row!', accelerator="F1", command=windowObj.add_row)
+        options.add_command(label='Add rows!', accelerator="F2", command=windowObj.add_rows)
+        options.add_command(label='Update!', accelerator="F5", command=windowObj.update_cells)
+        options.add_separator()
+        options.add_command(label='View!', command=windowObj.view_image)
+        options.add_separator()
+        options.add_command(label='Save image!', command=windowObj.save_img)
+        options.add_command(label='Export json or yaml', command=windowObj.save_yaml)
+        menubar.add_cascade(label="Options", menu=options)
+
+        windowObj.root.bind('<F1>', lambda x: windowObj.add_row())
+        windowObj.root.bind('<F2>', lambda x: windowObj.add_rows())
+        windowObj.root.bind('<F5>', lambda x: windowObj.update_cells())
+
+    def seve_table(self):
+        print('savein tabel')
+        saveFileName = asksaveasfilename(
+            initialfile="Untitle.csv",
+            defaultextension=".csv",
+            filetypes=[("All files", "*.*"),
+                       ("CSV files", "*.csv")]
+        )
+        with open(saveFileName, "w", encoding='utf-8') as sf:
+            for row in self.rows.values():
+
+                rCol = row[0].get()
+                rRow = row[1].get()
+
+
+                filepath = row[2]
+
+                sprFrame = row[-1].get()
+
+
+                print(rCol, rRow, filepath, sprFrame)
+
+                sf.write(f'{rCol},{rRow},"{filepath}",{sprFrame}\n')
+
+
+
+
