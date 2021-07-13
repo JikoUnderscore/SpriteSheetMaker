@@ -7,6 +7,10 @@ Maybe will update it in the future
 
 ![image](https://user-images.githubusercontent.com/59426055/125518065-cddf3792-cf36-4d44-a761-4b3b562d3830.png)
 
+### Hotkeys: 
+F1 = lets you choose a single image and add it into the row (add one row)
+F2 = lets you choose a multiple images and add them into the rows (add rows)
+F5 = updates 'x' and 'y' cells
 
 ## USEGE:
 
