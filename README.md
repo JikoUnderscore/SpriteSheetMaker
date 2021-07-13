@@ -11,7 +11,7 @@ Maybe will update it in the future
 ## USEGE:
 
 Edit the **row**, **col** and **separate frames (frames)**.
-Row is the row of with the image will be placed on the imag, col is for the corresponding column.
+'row' is the row of with the image will be placed on the image, 'col' is for the corresponding column.
 Separate frames (frames) is for the nested dict/json/yaml.
 
 The other fields are auto generated.
