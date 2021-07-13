@@ -5,28 +5,39 @@ Made this for my need in one day.
 
 Maybe will update it in the future
 
+
+
 ![image](https://user-images.githubusercontent.com/59426055/125518065-cddf3792-cf36-4d44-a761-4b3b562d3830.png)
 
+***
+
 ### Hotkeys: 
-F1 = lets you choose a single image and add it into the row (add one row)
-F2 = lets you choose a multiple images and add them into the rows (add rows)
-F5 = updates 'x' and 'y' cells
 
-## USEGE:
 
-Edit the **row**, **col** and **separate frames (frames)**.
-'row' is the row of with the image will be placed on the image, 'col' is for the corresponding column.
+F1 = lets you choose a single image and add it into the row (add one row).  
+F2 = lets you choose a multiple images and add them into the rows (add rows).  
+F5 = updates 'x' and 'y' cells.  
+
+***
+
+'row' is the row of with the image will be placed on the image, 'col' is for the corresponding column.  
 Separate frames (frames) is for the nested dict/json/yaml.
 
 The other fields are auto generated.
 
-The x entry is width position and width position plus with of image. It is created by taking the row entry.
-The y is corresponding for height.
-
+The 'x' cells is width position and width position plus with of image. It is created by taking the row entry.
+The 'y' is corresponding for height.
 
 |  _ |   _                            |        _        |   _  |        _                  | _
 --- | ---                           | ---            |---  | ---                      | ---
 | x |  \<number in row\> * img.width  | x + img.width  |   y | \<number in col\> * height | y + img.height |
+
+
+***
+## USEGE:
+
+Edit the **row**, **col** and **separate frames (frames)**.
+
 
 ### EXAMPLE:
 
