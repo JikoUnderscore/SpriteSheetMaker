@@ -53,8 +53,9 @@ class Window:
         self.mb = MenuBar(self)
 
     def view_image(self):
-        newImg = self._proses_img()
-        newImg.show()
+        if self.controlers:
+            newImg = self._proses_img()
+            newImg.show()
 
     def add_rows(self):
         filez = askopenfilenames(title='Choose a file')
@@ -138,15 +139,17 @@ class Window:
 
     def update_buttons_locatons(self):
         self.ofset += 1
-        self.buttonadd.grid(row=self.ofset, column=0, columnspan=5,)
-        self.addMultiple.grid(row=self.ofset, column=4, columnspan=5)
-        self.update.grid(row=self.ofset, column=8, columnspan=5)
+        self.buttonadd.grid(row=self.ofset, column=0, columnspan=2)
+        self.addMultiple.grid(row=self.ofset, column=4, columnspan=2)
+        self.update.grid(row=self.ofset, column=8, columnspan=2)
 
-        self.save.grid(row=self.ofset + 1, column=0, columnspan=5)
-        self.savYaml.grid(row=self.ofset + 1, column=4, columnspan=5)
-        self.view.grid(row=self.ofset + 1, column=8, columnspan=5)
+        self.save.grid(row=self.ofset + 1, column=0, columnspan=2)
+        self.savYaml.grid(row=self.ofset + 1, column=4, columnspan=2)
+        self.view.grid(row=self.ofset + 1, column=8, columnspan=2)
 
     def update_cells(self):
+        if not self.controlers:
+            return
         self.indent.clear()
         self.saveW, self.savaH = 0, 0
         for row in self.controlers.values():
@@ -184,8 +187,6 @@ class Window:
             if int(xEnd.get()) > self.saveW:
                 self.saveW = int(xEnd.get())
 
-        # print(self.savaH, self.saveW, self.indent)
-
     def _proses_img(self):
         self.update_cells()
         newImg = Image.new('RGBA', (self.saveW, self.savaH))
@@ -209,6 +210,8 @@ class Window:
         return newImg
 
     def save_img(self):
+        if not self.controlers:
+            return
         newImg = self._proses_img()
         saveimgLoc = asksaveasfilename(
             initialfile="Untitle.png",
@@ -216,10 +219,13 @@ class Window:
             filetypes=[("All files", "*.*"),
                        ("PNG files", "*.png"),
                        ("JPG files", "*.jpg")])
-
-        newImg.save(saveimgLoc)
+        if saveimgLoc != '':
+            newImg.save(saveimgLoc)
 
     def save_yaml(self):
+        if not self.controlers:
+            return
+
         self.update_cells()
         # print('saveing')
         ymalfile = {non: {} for non in self.indent}
@@ -249,12 +255,12 @@ class Window:
             filetypes=[("All files", "*.*"),
                        ("YAML files", "*.yaml"),
                        ("JSON files", "*.json")])
-
-        with open(saveimgLoc, "w") as f:
-            if saveimgLoc.endswith(".yaml"):
-                yaml.dump(ymalfile, f, default_flow_style=None)
-            else:
-                json.dump(ymalfile, f, ensure_ascii=False, indent=4)
+        if saveimgLoc != '':
+            with open(saveimgLoc, "w") as f:
+                if saveimgLoc.endswith(".yaml"):
+                    yaml.dump(ymalfile, f, default_flow_style=None)
+                else:
+                    json.dump(ymalfile, f, ensure_ascii=False, indent=4)
 
 
 
@@ -320,7 +326,5 @@ class MenuBar:
                 # print(rCol, rRow, filepath, sprFrame)
 
                 sf.write(f'{rCol},{rRow},"{filepath}",{sprFrame}\n')
-
-
 
 
