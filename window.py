@@ -121,7 +121,7 @@ class Window:
         b = tk.Button(self.innerFrame, text='pop', command=partial(self.remove_row, self.rowAdded), font=('Helvetica', '7'), width=5)
         b.grid(row=self.rowAdded, column=14)
 
-        l3 = tk.Label(self.innerFrame, text="saprate frame")
+        l3 = tk.Label(self.innerFrame, text="frames")
         ind = tk.Entry(self.innerFrame, width=30)
         ind.insert(0, f"{fileName.split('.')[0]}_n{self.row}")
         l3.grid(row=self.rowAdded, column=15)
@@ -234,7 +234,11 @@ class Window:
             # imgRow = row[0]
             # imgCol = row[1]
 
-            img = row[2].split(r'/')[-1]
+            imgPath = row[2]
+            img = imgPath.split(r'/')[-1]
+
+            width, height = Image.open(imgPath).size
+
 
             xStart = row[3]
             xEnd = row[4]
@@ -244,7 +248,9 @@ class Window:
 
             ymalfile[row[-1].get()][f"{img}{i}"] = {
                 'x': [xStart.get(), xEnd.get()],
-                'y': [yStart.get(), yEnd.get()]
+                'y': [yStart.get(), yEnd.get()],
+                'w': width,
+                'h': height
             }
 
 
@@ -304,7 +310,8 @@ class MenuBar:
         windowObj.root.bind('<F5>', lambda x: windowObj.update_cells())
 
     def seve_table(self):
-        # print('savein tabel')
+        if not self.rows:
+            return
         saveFileName = asksaveasfilename(
             initialfile="Untitle.csv",
             defaultextension=".csv",
