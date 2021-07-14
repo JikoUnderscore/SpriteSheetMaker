@@ -58,7 +58,7 @@ class Window:
             newImg.show()
 
     def add_rows(self):
-        filez = askopenfilenames(title='Choose a file')
+        filez = askopenfilenames(initialdir=self.currentDir, title='Choose a file')
         # print(filez)
         # print(len(filez))
         for path in filez:
@@ -275,10 +275,11 @@ class MenuBar:
         menubar = tk.Menu(windowObj.root)
         windowObj.root.config(menu=menubar)
 
-        self.rows = windowObj.controlers
+        self.windowObj = windowObj
 
         file = tk.Menu(menubar, tearoff=0)
-        file.add_command(label='Save to VSC', command=self.seve_table)
+        file.add_command(label='Save to CSV', command=self.seve_table)
+        file.add_command(label='Open CSV', command=self.load_tabel)
         file.add_separator()
         file.add_command(label="Exit", command=sys.exit)
 
@@ -310,7 +311,7 @@ class MenuBar:
         windowObj.root.bind('<F5>', lambda x: windowObj.update_cells())
 
     def seve_table(self):
-        if not self.rows:
+        if not self.windowObj.controlers:
             return
         saveFileName = asksaveasfilename(
             initialfile="Untitle.csv",
@@ -319,7 +320,7 @@ class MenuBar:
                        ("CSV files", "*.csv")]
         )
         with open(saveFileName, "w", encoding='utf-8') as sf:
-            for row in self.rows.values():
+            for row in self.windowObj.controlers.values():
 
                 rCol = row[0].get()
                 rRow = row[1].get()
@@ -330,8 +331,66 @@ class MenuBar:
                 sprFrame = row[-1].get()
 
 
-                # print(rCol, rRow, filepath, sprFrame)
+                sf.write(f'{rCol},{rRow},{filepath},{sprFrame}\n')
 
-                sf.write(f'{rCol},{rRow},"{filepath}",{sprFrame}\n')
+    def load_tabel(self):
+        csvLoc = askopenfilename(title="Open CSV")
 
 
+
+        if csvLoc != '':
+            self.windowObj.controlers.clear()
+            self.windowObj.rowAdded = 0
+
+            with open(csvLoc, 'r') as fr:
+                for csvRow in fr:
+                    csv = csvRow.split(',')
+                    self.windowObj.update_buttons_locatons()
+
+                    row = tk.Label(self.windowObj.innerFrame, text='row')
+                    e1 = tk.Entry(self.windowObj.innerFrame, width=5)
+                    e1.insert(0, csv[0])
+                    row.grid(row=self.windowObj.rowAdded, column=0)
+                    e1.grid(row=self.windowObj.rowAdded, column=1)
+
+                    col = tk.Label(self.windowObj.innerFrame, text='col')
+                    e2 = tk.Entry(self.windowObj.innerFrame, width=5)
+                    e2.insert(0, csv[1])
+                    col.grid(row=self.windowObj.rowAdded, column=2)
+                    e2.grid(row=self.windowObj.rowAdded, column=3)
+
+                    e3 = tk.Entry(self.windowObj.innerFrame, width=len(csv[2]))
+                    e3.insert(0, csv[2])
+                    e3.grid(row=self.windowObj.rowAdded, column=4, columnspan=3)
+
+                    l1 = tk.Label(self.windowObj.innerFrame, text='x')
+                    e4 = tk.Entry(self.windowObj.innerFrame, width=5)
+                    e4.insert(0, 0)
+                    l1.grid(row=self.windowObj.rowAdded, column=8)
+                    e4.grid(row=self.windowObj.rowAdded, column=9)
+
+                    e5 = tk.Entry(self.windowObj.innerFrame, width=5)
+                    e5.insert(0, 0)
+                    e5.grid(row=self.windowObj.rowAdded, column=10)
+
+                    l2 = tk.Label(self.windowObj.innerFrame, text='y')
+                    e6 = tk.Entry(self.windowObj.innerFrame, width=5)
+                    e6.insert(0, 0)
+                    l2.grid(row=self.windowObj.rowAdded, column=11)
+                    e6.grid(row=self.windowObj.rowAdded, column=12)
+
+                    e7 = tk.Entry(self.windowObj.innerFrame, width=5)
+                    e7.insert(0, 0)
+                    e7.grid(row=self.windowObj.rowAdded, column=13)
+
+                    b = tk.Button(self.windowObj.innerFrame, text='pop', command=partial(self.windowObj.remove_row, self.windowObj.rowAdded), font=('Helvetica', '7'), width=5)
+                    b.grid(row=self.windowObj.rowAdded, column=14)
+
+                    l3 = tk.Label(self.windowObj.innerFrame, text="frames")
+                    ind = tk.Entry(self.windowObj.innerFrame, width=30)
+                    ind.insert(0, csv[3])
+                    l3.grid(row=self.windowObj.rowAdded, column=15)
+                    ind.grid(row=self.windowObj.rowAdded, column=16)
+
+                    self.windowObj.controlers[self.windowObj.rowAdded] = [e1, e2, csv[2], e4, e5, e6, e7, e3, l1, l2, l3, row, col, b, ind]
+                    self.windowObj.rowAdded += 1
