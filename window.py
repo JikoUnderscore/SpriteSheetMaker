@@ -7,7 +7,7 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename, askopenfilena
 from PIL import Image
 from tkscrolledframe import ScrolledFrame
 from functools import partial
-
+import webbrowser
 
 class Window:
     def __init__(self):
@@ -51,6 +51,9 @@ class Window:
         self.lastNumberInFile = None
         self.row = 0
         self.mb = MenuBar(self)
+        self.lnta = tk.Label(self.root, text='Click to donate to my PAYPAL', relief=tk.SUNKEN, anchor=tk.W)
+        self.lnta.bind("<Button-1>", lambda e: webbrowser.open_new("http://www.paypal.me/JikoUnderscore/1"))
+        self.lnta.place(anchor=tk.S, relx=0.50, rely=1, relwidth=1)
 
     def view_image(self):
         if self.controlers:
@@ -58,14 +61,12 @@ class Window:
             newImg.show()
 
     def add_rows(self):
-        filez = askopenfilenames(initialdir=self.currentDir, title='Choose a file')
-        # print(filez)
-        # print(len(filez))
+        filez = askopenfilenames(title='Choose a file')
         for path in filez:
             self._add_row(path)
 
     def add_row(self):
-        imgLoc = askopenfilename(initialdir=self.currentDir, title="Select Image")
+        imgLoc = askopenfilename(title="Select Image")
         if imgLoc != "":
             self.currentDir = imgLoc
 
@@ -227,7 +228,6 @@ class Window:
             return
 
         self.update_cells()
-        # print('saveing')
         ymalfile = {non: {} for non in self.indent}
 
         for i, row in enumerate(self.controlers.values()):
@@ -254,7 +254,6 @@ class Window:
             }
 
 
-        # print(ymalfile)
         saveimgLoc: str = asksaveasfilename(
             initialfile="Untitle.yaml",
             defaultextension=".yaml",
