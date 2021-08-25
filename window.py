@@ -153,9 +153,11 @@ class Window:
             return
         self.indent.clear()
         self.saveW, self.savaH = 0, 0
+        d = {}
+
         for row in self.controlers.values():
-            imgRow = row[0]
-            imgCol = row[1]
+            imgRow = int(row[0].get())
+            imgCol = int(row[1].get())
 
             img = row[2]
 
@@ -171,22 +173,44 @@ class Window:
             width, height = img.size
             img.close()
 
+            d[(imgRow, imgCol)] = (width, height)
+
+            h = self._calulate(d, imgCol)
+            w = self._calulate(d, imgRow, col=False)
+
             xStart.delete(0, tk.END)
-            xStart.insert(0, int(imgCol.get()) * width)
+            xStart.insert(0, w - width)
 
             xEnd.delete(0, tk.END)
-            xEnd.insert(0, int(xStart.get()) + width)
+            xEnd.insert(0, w)
 
             yStart.delete(0, tk.END)
-            yStart.insert(0, int(imgRow.get()) * height)
+            yStart.insert(0, h - height)
 
             yEnd.delete(0, tk.END)
-            yEnd.insert(0, int(yStart.get()) + height)
+            yEnd.insert(0, h)
 
             if int(yEnd.get()) > self.savaH:
                 self.savaH = int(yEnd.get())
             if int(xEnd.get()) > self.saveW:
                 self.saveW = int(xEnd.get())
+
+    @staticmethod
+    def _calulate(d: dict, imgColRow, col=True):
+        summ = 0
+        i = 0
+        for k, v in d.items():
+            if col:
+                if k[1] == imgColRow:
+                    print(f'index {i}, col {imgColRow} koe {col}')
+                    summ += v[1]
+            else:
+                if k[0] == imgColRow:
+                    print(f'index {i}, col {imgColRow} koe {col}')
+                    summ += v[0]
+            i += 1
+        return summ
+
 
     def _proses_img(self):
         self.update_cells()
