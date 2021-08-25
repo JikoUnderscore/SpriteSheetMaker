@@ -3,7 +3,7 @@ A simple python Sprite sheet maker. It takes separate images and plans them on a
 
 Made this for my need in one day.
 
-Maybe will update it in the future
+~~Maybe will update it in the future~~
 
 
 
