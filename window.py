@@ -9,6 +9,7 @@ from tkscrolledframe import ScrolledFrame
 from functools import partial
 import webbrowser
 
+
 class Window:
     def __init__(self):
         self.root = tk.Tk()
@@ -161,6 +162,16 @@ class Window:
 
             img = row[2]
 
+            img = Image.open(img)
+            d[(imgRow, imgCol)] = img.size
+            img.close()
+
+        for row in self.controlers.values():
+            imgRow = int(row[0].get())
+            imgCol = int(row[1].get())
+
+            img = row[2]
+
             xStart = row[3]
             xEnd = row[4]
 
@@ -173,22 +184,19 @@ class Window:
             width, height = img.size
             img.close()
 
-            d[(imgRow, imgCol)] = (width, height)
-
-            h = self._calulate(d, imgCol)
-            w = self._calulate(d, imgRow, col=False)
+            w, h = self._calulate(d, imgRow, imgCol)
 
             xStart.delete(0, tk.END)
-            xStart.insert(0, w - width)
+            xStart.insert(0, w)
 
             xEnd.delete(0, tk.END)
-            xEnd.insert(0, w)
+            xEnd.insert(0, w + width)
 
             yStart.delete(0, tk.END)
-            yStart.insert(0, h - height)
+            yStart.insert(0, h)
 
             yEnd.delete(0, tk.END)
-            yEnd.insert(0, h)
+            yEnd.insert(0, h + height)
 
             if int(yEnd.get()) > self.savaH:
                 self.savaH = int(yEnd.get())
@@ -196,20 +204,19 @@ class Window:
                 self.saveW = int(xEnd.get())
 
     @staticmethod
-    def _calulate(d: dict, imgColRow, col=True):
-        summ = 0
-        i = 0
+    def _calulate(d: dict, row: int, col: int):
+        newW = 0
+        newH = 0
+
         for k, v in d.items():
-            if col:
-                if k[1] == imgColRow:
-                    print(f'index {i}, col {imgColRow} koe {col}')
-                    summ += v[1]
-            else:
-                if k[0] == imgColRow:
-                    print(f'index {i}, col {imgColRow} koe {col}')
-                    summ += v[0]
-            i += 1
-        return summ
+            r, c = k
+            w, h = v
+
+            if r < row and c == col:
+                newH += h
+            if c < col and r == row:
+                newW += w
+        return newW, newH
 
 
     def _proses_img(self):
