@@ -220,7 +220,7 @@ class Window:
 
 
     def _proses_img(self):
-        self.update_cells()
+        # self.update_cells()
         newImg = Image.new('RGBA', (self.saveW, self.savaH))
         for row in self.controlers.values():
             # imgRow = row[0]
@@ -258,7 +258,7 @@ class Window:
         if not self.controlers:
             return
 
-        self.update_cells()
+        # self.update_cells()
         ymalfile = {non: {} for non in self.indent}
 
         for i, row in enumerate(self.controlers.values()):
