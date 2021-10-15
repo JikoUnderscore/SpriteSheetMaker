@@ -108,7 +108,7 @@ class Window:
 
         e5 = tk.Entry(self.innerFrame, width=5)
         e5.insert(0, 0)
-        e5.grid(row=self.rowAdded, column=10)
+        # e5.grid(row=self.rowAdded, column=10)
 
         l2 = tk.Label(self.innerFrame, text='y')
         e6 = tk.Entry(self.innerFrame, width=5)
@@ -118,7 +118,7 @@ class Window:
 
         e7 = tk.Entry(self.innerFrame, width=5)
         e7.insert(0, 0)
-        e7.grid(row=self.rowAdded, column=13)
+        # e7.grid(row=self.rowAdded, column=13)
 
         b = tk.Button(self.innerFrame, text='pop', command=partial(self.remove_row, self.rowAdded), font=('Helvetica', '7'), width=5)
         b.grid(row=self.rowAdded, column=14)
@@ -208,14 +208,20 @@ class Window:
         newW = 0
         newH = 0
 
+        rowAdded = []
+        colAdded = []
+
         for k, v in d.items():
             r, c = k
             w, h = v
 
-            if r < row and c == col:
+            if row > r and r not in rowAdded:
                 newH += h
-            if c < col and r == row:
+                rowAdded.append(r)
+            if col > c and c not in colAdded:
                 newW += w
+                colAdded.append(c)
+
         return newW, newH
 
 
@@ -401,7 +407,7 @@ class MenuBar:
 
                     e5 = tk.Entry(self.windowObj.innerFrame, width=5)
                     e5.insert(0, 0)
-                    e5.grid(row=self.windowObj.rowAdded, column=10)
+                    # e5.grid(row=self.windowObj.rowAdded, column=10)
 
                     l2 = tk.Label(self.windowObj.innerFrame, text='y')
                     e6 = tk.Entry(self.windowObj.innerFrame, width=5)
@@ -411,7 +417,7 @@ class MenuBar:
 
                     e7 = tk.Entry(self.windowObj.innerFrame, width=5)
                     e7.insert(0, 0)
-                    e7.grid(row=self.windowObj.rowAdded, column=13)
+                    # e7.grid(row=self.windowObj.rowAdded, column=13)
 
                     b = tk.Button(self.windowObj.innerFrame, text='pop', command=partial(self.windowObj.remove_row, self.windowObj.rowAdded), font=('Helvetica', '7'), width=5)
                     b.grid(row=self.windowObj.rowAdded, column=14)
