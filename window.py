@@ -52,7 +52,7 @@ class Window:
         self.lastNumberInFile = None
         self.row = 0
         self.mb = MenuBar(self)
-        self.lnta = tk.Label(self.root, text='Click to donate to my PAYPAL', relief=tk.SUNKEN, anchor=tk.W)
+        self.lnta = tk.Label(self.root, text='http://www.paypal.me/', relief=tk.SUNKEN, anchor=tk.W, fg='blue')
         self.lnta.bind("<Button-1>", lambda e: webbrowser.open_new("http://www.paypal.me/JikoUnderscore/1"))
         self.lnta.place(anchor=tk.S, relx=0.50, rely=1, relwidth=1)
 
