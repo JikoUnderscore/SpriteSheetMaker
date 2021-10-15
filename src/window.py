@@ -16,6 +16,7 @@ class Window:
         self.root.title('Sprite Sheet Maker')
         self.root.geometry("1280x680")
         self.root.resizable(width=True, height=True)
+        self.root.iconbitmap('ssm2.ico')
 
         sf = ScrolledFrame(self.root, width=680, height=680)
         sf.pack(side="top", expand=1, fill="both")
