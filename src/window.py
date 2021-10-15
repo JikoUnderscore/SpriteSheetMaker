@@ -16,7 +16,7 @@ class Window:
         self.root.title('Sprite Sheet Maker')
         self.root.geometry("1280x680")
         self.root.resizable(width=True, height=True)
-        self.root.iconbitmap('ssm2.ico')
+        self.root.iconbitmap('./ssm2.ico')
 
         sf = ScrolledFrame(self.root, width=680, height=680)
         sf.pack(side="top", expand=1, fill="both")
@@ -73,7 +73,6 @@ class Window:
         if self.autoupdateInt.get():
             self.update_cells()
 
-
     def add_row(self):
         imgLoc = askopenfilename(title="Select Image")
         if imgLoc != "":
@@ -81,7 +80,6 @@ class Window:
             self._add_row(imgLoc)
         if self.autoupdateInt.get():
             self.update_cells()
-
 
     def _add_row(self, imgLoc):
         self.update_buttons_locatons()
@@ -154,7 +152,6 @@ class Window:
         self.addMultiple.grid(row=self.ofset, column=4, columnspan=2)
         self.update.grid(row=self.ofset, column=8, columnspan=2)
         self.autoUpdateCheckbox.grid(row=self.ofset, column=10, columnspan=6)
-
 
         self.save.grid(row=self.ofset + 1, column=0, columnspan=2)
         self.savYaml.grid(row=self.ofset + 1, column=4, columnspan=2)
@@ -321,7 +318,7 @@ class MenuBar:
         self.windowObj = windowObj
 
         file = tk.Menu(menubar, tearoff=0)
-        file.add_command(label='Save to CSV', command=self.seve_table)
+        file.add_command(label='Save to CSV', command=self.save_table)
         file.add_command(label='Open CSV', command=self.load_tabel)
         file.add_separator()
         file.add_command(label="Exit", command=sys.exit)
@@ -353,7 +350,7 @@ class MenuBar:
         windowObj.root.bind('<F2>', lambda x: windowObj.add_rows())
         windowObj.root.bind('<F5>', lambda x: windowObj.update_cells())
 
-    def seve_table(self):
+    def save_table(self):
         if not self.windowObj.controlers:
             return
         saveFileName = asksaveasfilename(
@@ -369,13 +366,15 @@ class MenuBar:
 
                 filepath = row[2]
 
+                xStart = row[3].get()
+                yStart = row[5].get()
+
                 sprFrame = row[-1].get()
 
-                sf.write(f'{rCol},{rRow},{filepath},{sprFrame}\n')
+                sf.write(f'{rCol},{rRow},{filepath},{sprFrame},{xStart},{yStart}\n')
 
     def load_tabel(self):
         csvLoc = askopenfilename(title="Open CSV")
-
         if csvLoc != '':
             self.windowObj.controlers.clear()
             self.windowObj.rowAdded = 0
@@ -403,7 +402,7 @@ class MenuBar:
 
                     l1 = tk.Label(self.windowObj.innerFrame, text='x')
                     e4 = tk.Entry(self.windowObj.innerFrame, width=5)
-                    e4.insert(0, 0)
+                    e4.insert(0,csv[4])
                     l1.grid(row=self.windowObj.rowAdded, column=8)
                     e4.grid(row=self.windowObj.rowAdded, column=9)
 
@@ -413,7 +412,7 @@ class MenuBar:
 
                     l2 = tk.Label(self.windowObj.innerFrame, text='y')
                     e6 = tk.Entry(self.windowObj.innerFrame, width=5)
-                    e6.insert(0, 0)
+                    e6.insert(0, csv[5])
                     l2.grid(row=self.windowObj.rowAdded, column=11)
                     e6.grid(row=self.windowObj.rowAdded, column=12)
 
