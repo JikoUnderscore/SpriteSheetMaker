@@ -37,14 +37,17 @@ class Window:
         self.save = tk.Button(self.innerFrame, command=self.save_img, text='Save image!')
         self.savYaml = tk.Button(self.innerFrame, command=self.save_yaml, text='Export yaml or json!')
         self.view = tk.Button(self.innerFrame, command=self.view_image, text='View')
+        self.autoupdateInt = tk.IntVar()
+        self.autoUpdateCheckbox = tk.Checkbutton(self.innerFrame, text='auto update on add', var=self.autoupdateInt)
 
         self.buttonadd.grid(row=self.ofset, column=0, columnspan=2)
         self.addMultiple.grid(row=self.ofset, column=4, columnspan=2)
         self.update.grid(row=self.ofset, column=8, columnspan=2)
+        self.autoUpdateCheckbox.grid(row=self.ofset, column=10, columnspan=6)
 
         self.save.grid(row=self.ofset + 1, column=0, columnspan=2)
         self.savYaml.grid(row=self.ofset + 1, column=4, columnspan=2)
-        self.view.grid(row=self.ofset + 1, column=8, columnspan=2)
+        self.view.grid(row=self.ofset + 1, column=8, columnspan=4)
         self.currentDir = r"/"
 
         self.rowAdded = 0
@@ -66,12 +69,18 @@ class Window:
         for path in filez:
             self._add_row(path)
 
+        if self.autoupdateInt.get():
+            self.update_cells()
+
+
     def add_row(self):
         imgLoc = askopenfilename(title="Select Image")
         if imgLoc != "":
             self.currentDir = imgLoc
-
             self._add_row(imgLoc)
+        if self.autoupdateInt.get():
+            self.update_cells()
+
 
     def _add_row(self, imgLoc):
         self.update_buttons_locatons()
@@ -129,7 +138,6 @@ class Window:
         l3.grid(row=self.rowAdded, column=15)
         ind.grid(row=self.rowAdded, column=16)
 
-
         self.controlers[self.rowAdded] = [e1, e2, imgLoc, e4, e5, e6, e7, e3, l1, l2, l3, row, col, b, ind]
         self.rowAdded += 1
 
@@ -144,6 +152,8 @@ class Window:
         self.buttonadd.grid(row=self.ofset, column=0, columnspan=2)
         self.addMultiple.grid(row=self.ofset, column=4, columnspan=2)
         self.update.grid(row=self.ofset, column=8, columnspan=2)
+        self.autoUpdateCheckbox.grid(row=self.ofset, column=10, columnspan=6)
+
 
         self.save.grid(row=self.ofset + 1, column=0, columnspan=2)
         self.savYaml.grid(row=self.ofset + 1, column=4, columnspan=2)
@@ -224,7 +234,6 @@ class Window:
 
         return newW, newH
 
-
     def _proses_img(self):
         # self.update_cells()
         newImg = Image.new('RGBA', (self.saveW, self.savaH))
@@ -276,7 +285,6 @@ class Window:
 
             width, height = Image.open(imgPath).size
 
-
             xStart = row[3]
             xEnd = row[4]
 
@@ -290,7 +298,6 @@ class Window:
                 'h': height
             }
 
-
         saveimgLoc: str = asksaveasfilename(
             initialfile="Untitle.yaml",
             defaultextension=".yaml",
@@ -303,7 +310,6 @@ class Window:
                     yaml.dump(ymalfile, f, default_flow_style=None)
                 else:
                     json.dump(ymalfile, f, ensure_ascii=False, indent=4)
-
 
 
 class MenuBar:
@@ -357,22 +363,17 @@ class MenuBar:
         )
         with open(saveFileName, "w", encoding='utf-8') as sf:
             for row in self.windowObj.controlers.values():
-
                 rCol = row[0].get()
                 rRow = row[1].get()
-
 
                 filepath = row[2]
 
                 sprFrame = row[-1].get()
 
-
                 sf.write(f'{rCol},{rRow},{filepath},{sprFrame}\n')
 
     def load_tabel(self):
         csvLoc = askopenfilename(title="Open CSV")
-
-
 
         if csvLoc != '':
             self.windowObj.controlers.clear()
