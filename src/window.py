@@ -274,26 +274,26 @@ class Window:
         # self.update_cells()
         ymalfile = {non: {} for non in self.indent}
 
-        for i, row in enumerate(self.controlers.values()):
+        for row in self.controlers.values():
             # imgRow = row[0]
             # imgCol = row[1]
 
-            imgPath = row[2]
-            img = imgPath.split(r'/')[-1]
+            imgPath: str = row[2]
+            img: str = imgPath.split(r'/')[-1].rsplit('.', 1)[0]
 
             width, height = Image.open(imgPath).size
 
-            xStart = row[3]
-            xEnd = row[4]
+            xStart = int(row[3].get())
+            # xEnd = row[4]
 
-            yStart = row[5]
-            yEnd = row[6]
+            yStart = int(row[5].get())
+            # yEnd = row[6]
 
-            ymalfile[row[-1].get()][f"{img}{i}"] = {
-                'x': [xStart.get(), xEnd.get()],
-                'y': [yStart.get(), yEnd.get()],
+            ymalfile[row[-1].get()][img] = {
+                'h': height,
                 'w': width,
-                'h': height
+                'y': yStart,
+                'x': xStart,
             }
 
         saveimgLoc: str = asksaveasfilename(
