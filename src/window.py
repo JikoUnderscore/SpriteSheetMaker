@@ -1,10 +1,12 @@
 import json
 import sys
 import tkinter as tk
+
 import yaml
 import re
 from tkinter.filedialog import askopenfilename, asksaveasfilename, askopenfilenames
 from PIL import Image
+from PIL.Image import Image
 from tkscrolledframe import ScrolledFrame
 from functools import partial
 import webbrowser
@@ -27,7 +29,7 @@ class Window:
 
         self.ofset = 0
 
-        self.controlers: dict[int: list[tk.Entry]] = {}
+        self.controlers: dict[int, tuple[tk.Entry, tk.Entry, str, tk.Entry, tk.Entry, tk.Entry, tk.Entry, tk.Entry, tk.Label, tk.Label, tk.Label, tk.Label, tk.Label, tk.Button, tk.Entry]] = {}
         self.indent = []
 
         self.saveW, self.savaH = 0, 0
@@ -60,32 +62,32 @@ class Window:
         self.lnta.bind("<Button-1>", lambda e: webbrowser.open_new("http://www.paypal.me/JikoUnderscore/1"))
         self.lnta.place(anchor=tk.S, relx=0.50, rely=1, relwidth=1)
 
-    def view_image(self):
+    def view_image(self) -> None:
         if self.controlers:
-            newImg = self._proses_img()
+            newImg: Image = self._proses_img()
             newImg.show()
 
-    def add_rows(self):
-        filez = askopenfilenames(title='Choose a file')
+    def add_rows(self) -> None:
+        filez: str = askopenfilenames(title='Choose a file')
         for path in filez:
             self._add_row(path)
 
         if self.autoupdateInt.get():
             self.update_cells()
 
-    def add_row(self):
-        imgLoc = askopenfilename(title="Select Image")
+    def add_row(self) -> None:
+        imgLoc: str = askopenfilename(title="Select Image")
         if imgLoc != "":
             self.currentDir = imgLoc
             self._add_row(imgLoc)
         if self.autoupdateInt.get():
             self.update_cells()
 
-    def _add_row(self, imgLoc):
+    def _add_row(self, imgLoc: str) -> None:
         self.update_buttons_locatons()
 
-        fileName = imgLoc.split(r'/')[-1]
-        numberInTheFileName = (re.search(r'\d+', fileName).group())
+        fileName: str = imgLoc.split(r'/')[-1]
+        numberInTheFileName: str = (re.search(r'\d+', fileName).group())
         if self.lastNumberInFile == numberInTheFileName:
             self.row += 1
 
@@ -137,16 +139,16 @@ class Window:
         l3.grid(row=self.rowAdded, column=15)
         ind.grid(row=self.rowAdded, column=16)
 
-        self.controlers[self.rowAdded] = [e1, e2, imgLoc, e4, e5, e6, e7, e3, l1, l2, l3, row, col, b, ind]
+        self.controlers[self.rowAdded] = (e1, e2, imgLoc, e4, e5, e6, e7, e3, l1, l2, l3, row, col, b, ind)
         self.rowAdded += 1
 
-    def remove_row(self, row):
+    def remove_row(self, row: int) -> None:
         for ele in self.controlers[row]:
             if isinstance(ele, (tk.Entry, tk.Button, tk.Label)):
                 ele.destroy()
         del self.controlers[row]
 
-    def update_buttons_locatons(self):
+    def update_buttons_locatons(self) -> None:
         self.ofset += 1
         self.buttonadd.grid(row=self.ofset, column=0, columnspan=2)
         self.addMultiple.grid(row=self.ofset, column=4, columnspan=2)
@@ -157,7 +159,7 @@ class Window:
         self.savYaml.grid(row=self.ofset + 1, column=4, columnspan=2)
         self.view.grid(row=self.ofset + 1, column=8, columnspan=2)
 
-    def update_cells(self):
+    def update_cells(self) -> None:
         if not self.controlers:
             return
         self.indent.clear()
@@ -168,11 +170,11 @@ class Window:
             imgRow = int(row[0].get())
             imgCol = int(row[1].get())
 
-            img = row[2]
+            img: str = row[2]
 
-            img = Image.open(img)
-            d[(imgRow, imgCol)] = img.size
-            img.close()
+            imgI: Image = Image.open(img)
+            d[(imgRow, imgCol)] = imgI.size
+            imgI.close()
 
         for row in self.controlers.values():
             imgRow = int(row[0].get())
@@ -188,9 +190,9 @@ class Window:
 
             self.indent.append(row[-1].get())
 
-            img = Image.open(img)
-            width, height = img.size
-            img.close()
+            imgI = Image.open(img)
+            width, height = imgI.size
+            imgI.close()
 
             w, h = self._calulate(d, imgRow, imgCol)
 
@@ -212,12 +214,9 @@ class Window:
                 self.saveW = int(xEnd.get())
 
     @staticmethod
-    def _calulate(d: dict, row: int, col: int):
+    def _calulate(d: dict, row: int, col: int) -> tuple[int, int]:
         newW = 0
         newH = 0
-
-        rowAdded = []
-        colAdded = []
 
         for k, v in d.items():
             r, c = k
@@ -225,40 +224,33 @@ class Window:
 
             if row > r and col == c:
                 newH += h
-                rowAdded.append(r)
             if col > c and row == r:
                 newW += w
-                colAdded.append(c)
 
         return newW, newH
 
-    def _proses_img(self):
+    def _proses_img(self) -> Image:
         # self.update_cells()
         newImg = Image.new('RGBA', (self.saveW, self.savaH))
         for row in self.controlers.values():
-            # imgRow = row[0]
-            # imgCol = row[1]
-
             img = row[2]
 
             xStart = row[3]
-            # xEnd = row[4]
 
             yStart = row[5]
-            # yEnd = row[6]
 
-            img = Image.open(img)
+            imgI = Image.open(img)
 
-            newImg.paste(img, (int(xStart.get()), int(yStart.get())))
+            newImg.paste(imgI, (int(xStart.get()), int(yStart.get())))
 
-            img.close()
+            imgI.close()
         return newImg
 
-    def save_img(self):
+    def save_img(self) -> None:
         if not self.controlers:
             return
-        newImg = self._proses_img()
-        saveimgLoc = asksaveasfilename(
+        newImg: Image = self._proses_img()
+        saveimgLoc: str = asksaveasfilename(
             initialfile="Untitle.png",
             defaultextension=".png",
             filetypes=[("All files", "*.*"),
@@ -267,7 +259,7 @@ class Window:
         if saveimgLoc != '':
             newImg.save(saveimgLoc)
 
-    def save_yaml(self):
+    def save_yaml(self) -> None:
         if not self.controlers:
             return
 
@@ -275,19 +267,14 @@ class Window:
         ymalfile = {non: {} for non in self.indent}
 
         for row in self.controlers.values():
-            # imgRow = row[0]
-            # imgCol = row[1]
-
             imgPath: str = row[2]
             img: str = imgPath.split(r'/')[-1].rsplit('.', 1)[0]
 
             width, height = Image.open(imgPath).size
 
             xStart = int(row[3].get())
-            # xEnd = row[4]
 
             yStart = int(row[5].get())
-            # yEnd = row[6]
 
             ymalfile[row[-1].get()][img] = {
                 'h': height,
@@ -330,7 +317,7 @@ class MenuBar:
         editmenu.add_command(label="Copy", accelerator="Ctrl+C", command=lambda: windowObj.root.focus_get().event_generate('<<Copy>>'))
         editmenu.add_command(label="Paste", accelerator="Ctrl+V", command=lambda: windowObj.root.focus_get().event_generate('<<Paste>>'))
         editmenu.add_command(label="Select all", accelerator="Ctrl+A", command=lambda: windowObj.root.focus_get().event_generate('<<SelectAll>>'))
-        editmenu.add_separator()
+        # editmenu.add_separator()
         # editmenu.add_command(label="Undo", accelerator="Ctrl+Z", command=rodi.ent_txt.edit_undo)
         # editmenu.add_command(label="Redo", accelerator="Ctrl+Y", command=rodi.ent_txt.edit_redo)
         menubar.add_cascade(label="Edit", menu=editmenu)
@@ -350,10 +337,10 @@ class MenuBar:
         windowObj.root.bind('<F2>', lambda x: windowObj.add_rows())
         windowObj.root.bind('<F5>', lambda x: windowObj.update_cells())
 
-    def save_table(self):
+    def save_table(self) -> None:
         if not self.windowObj.controlers:
             return
-        saveFileName = asksaveasfilename(
+        saveFileName: str = asksaveasfilename(
             initialfile="Untitle.csv",
             defaultextension=".csv",
             filetypes=[("All files", "*.*"),
@@ -361,20 +348,20 @@ class MenuBar:
         )
         with open(saveFileName, "w", encoding='utf-8') as sf:
             for row in self.windowObj.controlers.values():
-                rCol = row[0].get()
-                rRow = row[1].get()
+                rCol: str = row[0].get()
+                rRow: str = row[1].get()
 
                 filepath = row[2]
 
-                xStart = row[3].get()
-                yStart = row[5].get()
+                xStart: str = row[3].get()
+                yStart: str = row[5].get()
 
-                sprFrame = row[-1].get()
+                sprFrame: str = row[-1].get()
 
                 sf.write(f'{rCol},{rRow},{filepath},{sprFrame},{xStart},{yStart}\n')
 
-    def load_tabel(self):
-        csvLoc = askopenfilename(title="Open CSV")
+    def load_tabel(self) -> None:
+        csvLoc: str = askopenfilename(title="Open CSV")
         if csvLoc != '':
             self.windowObj.controlers.clear()
             self.windowObj.rowAdded = 0
@@ -402,7 +389,7 @@ class MenuBar:
 
                     l1 = tk.Label(self.windowObj.innerFrame, text='x')
                     e4 = tk.Entry(self.windowObj.innerFrame, width=5)
-                    e4.insert(0,csv[4])
+                    e4.insert(0, csv[4])
                     l1.grid(row=self.windowObj.rowAdded, column=8)
                     e4.grid(row=self.windowObj.rowAdded, column=9)
 
@@ -429,5 +416,5 @@ class MenuBar:
                     l3.grid(row=self.windowObj.rowAdded, column=15)
                     ind.grid(row=self.windowObj.rowAdded, column=16)
 
-                    self.windowObj.controlers[self.windowObj.rowAdded] = [e1, e2, csv[2], e4, e5, e6, e7, e3, l1, l2, l3, row, col, b, ind]
+                    self.windowObj.controlers[self.windowObj.rowAdded] = (e1, e2, csv[2], e4, e5, e6, e7, e3, l1, l2, l3, row, col, b, ind)
                     self.windowObj.rowAdded += 1
