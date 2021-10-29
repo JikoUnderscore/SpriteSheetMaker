@@ -223,10 +223,10 @@ class Window:
             r, c = k
             w, h = v
 
-            if row > r and r not in rowAdded:
+            if row > r and col == c:
                 newH += h
                 rowAdded.append(r)
-            if col > c and c not in colAdded:
+            if col > c and row == r:
                 newW += w
                 colAdded.append(c)
 
