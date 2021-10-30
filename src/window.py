@@ -6,7 +6,6 @@ import yaml
 import re
 from tkinter.filedialog import askopenfilename, asksaveasfilename, askopenfilenames
 from PIL import Image
-from PIL.Image import Image
 from tkscrolledframe import ScrolledFrame
 from functools import partial
 import webbrowser
