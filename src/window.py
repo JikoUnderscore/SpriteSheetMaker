@@ -86,7 +86,13 @@ class Window:
         self.update_buttons_locatons()
 
         fileName: str = imgLoc.split(r'/')[-1]
-        numberInTheFileName: str = (re.search(r'\d+', fileName).group())
+
+        fileNameNumber: re.Match | None = re.search(r'\d+', fileName)
+        if fileNameNumber is None:
+            numberInTheFileName: str = '0'
+        else:
+            numberInTheFileName: str = fileNameNumber.group()
+
         if self.lastNumberInFile == numberInTheFileName:
             self.row += 1
 
