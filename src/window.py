@@ -40,7 +40,7 @@ class Window:
         self.savYaml = tk.Button(self.innerFrame, command=self.save_yaml, text='Export yaml or json!')
         self.view = tk.Button(self.innerFrame, command=self.view_image, text='View')
         self.autoupdateInt = tk.IntVar()
-        self.autoUpdateCheckbox = tk.Checkbutton(self.innerFrame, text='auto update on add', var=self.autoupdateInt)
+        self.autoUpdateCheckbox = tk.Checkbutton(self.innerFrame, text='auto update', var=self.autoupdateInt)
 
         self.buttonadd.grid(row=self.ofset, column=0, columnspan=2)
         self.addMultiple.grid(row=self.ofset, column=4, columnspan=2)
@@ -229,7 +229,8 @@ class Window:
         return newW, newH
 
     def _proses_img(self) -> Image:
-        # self.update_cells()
+        if self.autoupdateInt.get():
+            self.update_cells()
         newImg = Image.new('RGBA', (self.saveW, self.savaH))
         for row in self.controlers.values():
             img = row[2]
@@ -262,7 +263,8 @@ class Window:
         if not self.controlers:
             return
 
-        # self.update_cells()
+        if self.autoupdateInt.get():
+            self.update_cells()
         ymalfile = {non: {} for non in self.indent}
 
         for row in self.controlers.values():
