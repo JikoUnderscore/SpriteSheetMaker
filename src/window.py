@@ -362,7 +362,7 @@ class MenuBar:
 
                 sprFrame: str = row.framesEntry.get()
 
-                sf.write(f'{imgCol},{imgRow},{filepath},{sprFrame},{xStart},{yStart}\n')
+                sf.write(f'{imgRow},{imgCol},{filepath},{sprFrame},{xStart},{yStart}\n')
 
     def load_tabel(self) -> None:
         csvLoc: str = askopenfilename(title="Open CSV")
