@@ -66,7 +66,6 @@ class Window:
         self.save.grid(row=self.ofset + 1, column=0, columnspan=2)
         self.savYaml.grid(row=self.ofset + 1, column=4, columnspan=2)
         self.view.grid(row=self.ofset + 1, column=8, columnspan=4)
-        self.currentDir = r"/"
 
         self.rowAdded = 0
 
@@ -93,7 +92,6 @@ class Window:
     def add_row(self) -> None:
         imgLoc: str = askopenfilename(title="Select Image")
         if imgLoc != "":
-            self.currentDir = imgLoc
             self._add_row(imgLoc)
         if self.autoupdateInt.get():
             self.update_cells()
