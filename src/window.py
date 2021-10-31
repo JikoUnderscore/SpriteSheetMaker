@@ -1,6 +1,7 @@
 import json
 import sys
 import tkinter as tk
+from typing import NamedTuple
 
 import yaml
 import re
@@ -9,6 +10,21 @@ from PIL import Image
 from tkscrolledframe import ScrolledFrame
 from functools import partial
 import webbrowser
+
+
+class WidgetRow(NamedTuple):
+    rowL: tk.Label
+    rowEntry: tk.Entry
+    colL: tk.Label
+    colEntry: tk.Entry
+    imgPath: tk.Entry
+    xL: tk.Label
+    xEntry: tk.Entry
+    yL: tk.Label
+    yEntry: tk.Entry
+    pop: tk.Button
+    framesL: tk.Label
+    framesEntry: tk.Entry
 
 
 class Window:
@@ -21,14 +37,14 @@ class Window:
 
         sf = ScrolledFrame(self.root, width=680, height=680)
         sf.pack(side="top", expand=1, fill="both")
-        # sf.bind_arrow_keys(self.root)
+        sf.bind_arrow_keys(self.root)
         sf.bind_scroll_wheel(self.root)
 
         self.innerFrame = sf.display_widget(tk.Frame)
 
         self.ofset = 0
 
-        self.controlers: dict[int, tuple[tk.Entry, tk.Entry, str, tk.Entry, tk.Entry, tk.Entry, tk.Entry, tk.Entry, tk.Label, tk.Label, tk.Label, tk.Label, tk.Label, tk.Button, tk.Entry]] = {}
+        self.controlers: dict[int, WidgetRow] = {}
         self.indent = []
 
         self.saveW, self.savaH = 0, 0
@@ -121,19 +137,12 @@ class Window:
         l1.grid(row=self.rowAdded, column=8)
         e4.grid(row=self.rowAdded, column=9)
 
-        e5 = tk.Entry(self.innerFrame, width=5)
-        e5.insert(0, 0)
-        # e5.grid(row=self.rowAdded, column=10)
-
         l2 = tk.Label(self.innerFrame, text='y')
         e6 = tk.Entry(self.innerFrame, width=5)
         e6.insert(0, 0)
         l2.grid(row=self.rowAdded, column=11)
         e6.grid(row=self.rowAdded, column=12)
 
-        e7 = tk.Entry(self.innerFrame, width=5)
-        e7.insert(0, 0)
-        # e7.grid(row=self.rowAdded, column=13)
 
         b = tk.Button(self.innerFrame, text='pop', command=partial(self.remove_row, self.rowAdded), font=('Helvetica', '7'), width=5)
         b.grid(row=self.rowAdded, column=14)
@@ -144,7 +153,8 @@ class Window:
         l3.grid(row=self.rowAdded, column=15)
         ind.grid(row=self.rowAdded, column=16)
 
-        self.controlers[self.rowAdded] = (e1, e2, imgLoc, e4, e5, e6, e7, e3, l1, l2, l3, row, col, b, ind)
+        # self.controlers[self.rowAdded] = (e1, e2, imgLoc, e4, e5, e6, e7, e3, l1, l2, l3, row, col, b, ind)
+        self.controlers[self.rowAdded] = WidgetRow(row, e1, col, e2, e3, l1, e4, l2, e6, b, l3, ind)
         self.rowAdded += 1
 
     def remove_row(self, row: int) -> None:
@@ -172,28 +182,25 @@ class Window:
         d = {}
 
         for row in self.controlers.values():
-            imgRow = int(row[0].get())
-            imgCol = int(row[1].get())
+            imgRow = int(row.rowEntry.get())
+            imgCol = int(row.colEntry .get())
 
-            img: str = row[2]
+            img: str = row.imgPath.get()
 
             imgI: Image = Image.open(img)
             d[(imgRow, imgCol)] = imgI.size
             imgI.close()
 
         for row in self.controlers.values():
-            imgRow = int(row[0].get())
-            imgCol = int(row[1].get())
+            imgRow = int(row.rowEntry.get())
+            imgCol = int(row.colEntry.get())
 
-            img = row[2]
+            img: str = row.imgPath.get()
 
-            xStart = row[3]
-            xEnd = row[4]
+            xStart = row.xEntry
+            yStart = row.yEntry
 
-            yStart = row[5]
-            yEnd = row[6]
-
-            self.indent.append(row[-1].get())
+            self.indent.append(row.framesEntry.get())
 
             imgI = Image.open(img)
             width, height = imgI.size
@@ -204,19 +211,13 @@ class Window:
             xStart.delete(0, tk.END)
             xStart.insert(0, w)
 
-            xEnd.delete(0, tk.END)
-            xEnd.insert(0, w + width)
-
             yStart.delete(0, tk.END)
             yStart.insert(0, h)
 
-            yEnd.delete(0, tk.END)
-            yEnd.insert(0, h + height)
-
-            if int(yEnd.get()) > self.savaH:
-                self.savaH = int(yEnd.get())
-            if int(xEnd.get()) > self.saveW:
-                self.saveW = int(xEnd.get())
+            if h + height > self.savaH:
+                self.savaH = h + height
+            if w + width > self.saveW:
+                self.saveW = w + width
 
     @staticmethod
     def _calulate(d: dict, row: int, col: int) -> tuple[int, int]:
@@ -239,11 +240,10 @@ class Window:
             self.update_cells()
         newImg = Image.new('RGBA', (self.saveW, self.savaH))
         for row in self.controlers.values():
-            img = row[2]
+            img: str = row.imgPath.get()
 
-            xStart = row[3]
-
-            yStart = row[5]
+            xStart = row.xEntry
+            yStart = row.yEntry
 
             imgI = Image.open(img)
 
@@ -274,16 +274,15 @@ class Window:
         ymalfile = {non: {} for non in self.indent}
 
         for row in self.controlers.values():
-            imgPath: str = row[2]
+            imgPath: str = row.imgPath.get()
             img: str = imgPath.split(r'/')[-1].rsplit('.', 1)[0]
 
             width, height = Image.open(imgPath).size
 
-            xStart = int(row[3].get())
+            xStart = int(row.xEntry.get())
+            yStart = int(row.yEntry.get())
 
-            yStart = int(row[5].get())
-
-            ymalfile[row[-1].get()][img] = {
+            ymalfile[row.framesEntry.get()][img] = {
                 'h': height,
                 'w': width,
                 'y': yStart,
@@ -355,17 +354,17 @@ class MenuBar:
         )
         with open(saveFileName, "w", encoding='utf-8') as sf:
             for row in self.windowObj.controlers.values():
-                rCol: str = row[0].get()
-                rRow: str = row[1].get()
+                imgRow = row.rowEntry.get()
+                imgCol = row.colEntry.get()
 
-                filepath = row[2]
+                filepath = row.imgPath.get()
 
-                xStart: str = row[3].get()
-                yStart: str = row[5].get()
+                xStart: str = row.xEntry.get()
+                yStart: str = row.yEntry.get()
 
-                sprFrame: str = row[-1].get()
+                sprFrame: str = row.framesEntry.get()
 
-                sf.write(f'{rCol},{rRow},{filepath},{sprFrame},{xStart},{yStart}\n')
+                sf.write(f'{imgCol},{imgRow},{filepath},{sprFrame},{xStart},{yStart}\n')
 
     def load_tabel(self) -> None:
         csvLoc: str = askopenfilename(title="Open CSV")
@@ -400,9 +399,6 @@ class MenuBar:
                     l1.grid(row=self.windowObj.rowAdded, column=8)
                     e4.grid(row=self.windowObj.rowAdded, column=9)
 
-                    e5 = tk.Entry(self.windowObj.innerFrame, width=5)
-                    e5.insert(0, 0)
-                    # e5.grid(row=self.windowObj.rowAdded, column=10)
 
                     l2 = tk.Label(self.windowObj.innerFrame, text='y')
                     e6 = tk.Entry(self.windowObj.innerFrame, width=5)
@@ -410,9 +406,6 @@ class MenuBar:
                     l2.grid(row=self.windowObj.rowAdded, column=11)
                     e6.grid(row=self.windowObj.rowAdded, column=12)
 
-                    e7 = tk.Entry(self.windowObj.innerFrame, width=5)
-                    e7.insert(0, 0)
-                    # e7.grid(row=self.windowObj.rowAdded, column=13)
 
                     b = tk.Button(self.windowObj.innerFrame, text='pop', command=partial(self.windowObj.remove_row, self.windowObj.rowAdded), font=('Helvetica', '7'), width=5)
                     b.grid(row=self.windowObj.rowAdded, column=14)
@@ -423,5 +416,5 @@ class MenuBar:
                     l3.grid(row=self.windowObj.rowAdded, column=15)
                     ind.grid(row=self.windowObj.rowAdded, column=16)
 
-                    self.windowObj.controlers[self.windowObj.rowAdded] = (e1, e2, csv[2], e4, e5, e6, e7, e3, l1, l2, l3, row, col, b, ind)
+                    self.windowObj.controlers[self.windowObj.rowAdded] = WidgetRow(row, e1, col, e2, e3, l1, e4, l2, e6, b, l3, ind)
                     self.windowObj.rowAdded += 1
