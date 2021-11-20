@@ -1,6 +1,8 @@
 import json
 import sys
+import threading
 import tkinter as tk
+from pprint import pprint
 from typing import NamedTuple
 
 import yaml
@@ -141,7 +143,6 @@ class Window:
         l2.grid(row=self.rowAdded, column=11)
         e6.grid(row=self.rowAdded, column=12)
 
-
         b = tk.Button(self.innerFrame, text='pop', command=partial(self.remove_row, self.rowAdded), font=('Helvetica', '7'), width=5)
         b.grid(row=self.rowAdded, column=14)
 
@@ -156,9 +157,11 @@ class Window:
         self.rowAdded += 1
 
     def remove_row(self, row: int) -> None:
+        ele: tk.Entry | tk.Button | tk.Label
+
         for ele in self.controlers[row]:
-            if isinstance(ele, (tk.Entry, tk.Button, tk.Label)):
-                ele.destroy()
+            # if isinstance(ele, (tk.Entry, tk.Button, tk.Label)):
+            ele.destroy()
         del self.controlers[row]
 
     def update_buttons_locatons(self) -> None:
@@ -181,7 +184,7 @@ class Window:
 
         for row in self.controlers.values():
             imgRow = int(row.rowEntry.get())
-            imgCol = int(row.colEntry .get())
+            imgCol = int(row.colEntry.get())
 
             img: str = row.imgPath.get()
 
@@ -327,6 +330,11 @@ class MenuBar:
         menubar.add_cascade(label="Edit", menu=editmenu)
 
         options = tk.Menu(menubar, tearoff=0)
+        sort = tk.Menu(options, tearoff=0)
+        sort.add_command(label="Sort by row", command=self.sort_x)
+        sort.add_command(label="Sort by col", command=self.sort_y)
+        options.add_cascade(label="Sorting...", menu=sort)
+        options.add_separator()
         options.add_command(label='Add one row!', accelerator="F1", command=windowObj.add_row)
         options.add_command(label='Add rows!', accelerator="F2", command=windowObj.add_rows)
         options.add_command(label='Update!', accelerator="F5", command=windowObj.update_cells)
@@ -397,13 +405,11 @@ class MenuBar:
                     l1.grid(row=self.windowObj.rowAdded, column=8)
                     e4.grid(row=self.windowObj.rowAdded, column=9)
 
-
                     l2 = tk.Label(self.windowObj.innerFrame, text='y')
                     e6 = tk.Entry(self.windowObj.innerFrame, width=5)
                     e6.insert(0, csv[5])
                     l2.grid(row=self.windowObj.rowAdded, column=11)
                     e6.grid(row=self.windowObj.rowAdded, column=12)
-
 
                     b = tk.Button(self.windowObj.innerFrame, text='pop', command=partial(self.windowObj.remove_row, self.windowObj.rowAdded), font=('Helvetica', '7'), width=5)
                     b.grid(row=self.windowObj.rowAdded, column=14)
@@ -416,3 +422,82 @@ class MenuBar:
 
                     self.windowObj.controlers[self.windowObj.rowAdded] = WidgetRow(row, e1, col, e2, e3, l1, e4, l2, e6, b, l3, ind)
                     self.windowObj.rowAdded += 1
+
+    def sort_x(self):
+        if not self.windowObj.controlers:
+            return
+        self._sort()
+
+    def sort_y(self):
+        if not self.windowObj.controlers:
+            return
+        self._sort(1)
+
+    def _sort(self, sort_x=0):
+        temp_container: list[tuple[int, int, str, str, str, str]] = []
+        for row in self.windowObj.controlers.values():
+            imgRow: str = row.rowEntry.get()
+            imgCol: str = row.colEntry.get()
+
+            filepath: str = row.imgPath.get()
+
+            xStart: str = row.xEntry.get()
+            yStart: str = row.yEntry.get()
+
+            sprFrame: str = row.framesEntry.get()
+
+            temp_container.append((int(imgRow), int(imgCol), filepath, sprFrame, xStart, yStart))
+
+        ele: tk.Entry | tk.Button | tk.Label
+
+        for widget_row in self.windowObj.controlers.values():
+            for ele in widget_row:
+                ele.destroy()
+
+        self.windowObj.controlers.clear()
+        self.windowObj.rowAdded = 0
+
+        temp_container = sorted(temp_container, key=lambda x: x[sort_x])
+
+        for tmp in temp_container:
+            self.windowObj.update_buttons_locatons()
+
+            row = tk.Label(self.windowObj.innerFrame, text='row')
+            e1 = tk.Entry(self.windowObj.innerFrame, width=5)
+            e1.insert(0, tmp[0])
+            row.grid(row=self.windowObj.rowAdded, column=0)
+            e1.grid(row=self.windowObj.rowAdded, column=1)
+
+            col = tk.Label(self.windowObj.innerFrame, text='col')
+            e2 = tk.Entry(self.windowObj.innerFrame, width=5)
+            e2.insert(0, tmp[1])
+            col.grid(row=self.windowObj.rowAdded, column=2)
+            e2.grid(row=self.windowObj.rowAdded, column=3)
+
+            e3 = tk.Entry(self.windowObj.innerFrame, width=len(tmp[2]))
+            e3.insert(0, tmp[2])
+            e3.grid(row=self.windowObj.rowAdded, column=4, columnspan=3)
+
+            l1 = tk.Label(self.windowObj.innerFrame, text='x')
+            e4 = tk.Entry(self.windowObj.innerFrame, width=5)
+            e4.insert(0, tmp[4])
+            l1.grid(row=self.windowObj.rowAdded, column=8)
+            e4.grid(row=self.windowObj.rowAdded, column=9)
+
+            l2 = tk.Label(self.windowObj.innerFrame, text='y')
+            e6 = tk.Entry(self.windowObj.innerFrame, width=5)
+            e6.insert(0, tmp[5])
+            l2.grid(row=self.windowObj.rowAdded, column=11)
+            e6.grid(row=self.windowObj.rowAdded, column=12)
+
+            b = tk.Button(self.windowObj.innerFrame, text='pop', command=partial(self.windowObj.remove_row, self.windowObj.rowAdded), font=('Helvetica', '7'), width=5)
+            b.grid(row=self.windowObj.rowAdded, column=14)
+
+            l3 = tk.Label(self.windowObj.innerFrame, text="frames")
+            ind = tk.Entry(self.windowObj.innerFrame, width=30)
+            ind.insert(0, tmp[3])
+            l3.grid(row=self.windowObj.rowAdded, column=15)
+            ind.grid(row=self.windowObj.rowAdded, column=16)
+
+            self.windowObj.controlers[self.windowObj.rowAdded] = WidgetRow(row, e1, col, e2, e3, l1, e4, l2, e6, b, l3, ind)
+            self.windowObj.rowAdded += 1
