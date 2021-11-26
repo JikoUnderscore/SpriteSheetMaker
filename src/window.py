@@ -457,7 +457,8 @@ class MenuBar:
         self.windowObj.controlers.clear()
         self.windowObj.rowAdded = 0
 
-        temp_container = sorted(temp_container, key=lambda x: x[sort_x])
+        other: int = 1 if sort_x == 0 else 0
+        temp_container = sorted(temp_container, key=lambda x: (x[sort_x], x[other]))
 
         for tmp in temp_container:
             self.windowObj.update_buttons_locatons()
