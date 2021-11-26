@@ -39,10 +39,10 @@ class Window:
 
         sf = ScrolledFrame(self.root, width=680, height=680)
         sf.pack(side="top", expand=1, fill="both")
-        sf.bind_arrow_keys(self.root)
+        # sf.bind_arrow_keys(self.root)
         sf.bind_scroll_wheel(self.root)
 
-        self.innerFrame = sf.display_widget(tk.Frame)
+        self.innerFrame: tk.Frame = sf.display_widget(tk.Frame)
 
         self.ofset = 0
 
@@ -74,9 +74,60 @@ class Window:
         self.lastNumberInFile = None
         self.row = 0
         self.mb = MenuBar(self)
+
+        self.focusROW = 0
+        self.focusCOL = 0
+        self.root.bind("<Up>", lambda event: self._arrow_move_row(-1))
+        self.root.bind("<Down>", lambda event: self._arrow_move_row(1))
+
+        self.root.bind("<Left>", lambda event: self._arrow_move_col(0))
+        self.root.bind("<Right>", lambda event: self._arrow_move_col(1))
+
         self.lnta = tk.Label(self.root, text='http://www.paypal.me/', relief=tk.SUNKEN, anchor=tk.W, fg='blue')
         self.lnta.bind("<Button-1>", lambda e: webbrowser.open_new("http://www.paypal.me/JikoUnderscore/1"))
         self.lnta.place(anchor=tk.S, relx=0.50, rely=1, relwidth=1)
+
+    def _arrow_move_row(self, direction: int):
+        self._get_curent_focuss()
+
+        row: int = self.focusROW + direction
+        if row < 0:
+            row = 0
+        if row > (l := len(self.controlers) - 1):
+            row = l
+
+        wig: WidgetRow = self.controlers[row]
+        if self.focusCOL == 0:
+            wig.rowEntry.focus_set()
+            wig.rowEntry.selection_range(0, tk.END)
+        elif self.focusCOL == 1:
+            wig.colEntry.focus_set()
+            wig.colEntry.selection_range(0, tk.END)
+
+    def _arrow_move_col(self, direction: int):
+        self._get_curent_focuss()
+
+        wig: WidgetRow = self.controlers[self.focusROW]
+
+        if direction == 0:
+            wig.rowEntry.focus_set()
+            wig.rowEntry.selection_range(0, tk.END)
+        elif direction == 1:
+            wig.colEntry.focus_set()
+            wig.colEntry.selection_range(0, tk.END)
+
+    def _get_curent_focuss(self):
+        print("FOCUS: ", self.root.focus_get())
+        for index, wig in enumerate(self.controlers.values()):
+            if wig.colEntry is self.root.focus_get() or wig.rowEntry is self.root.focus_get():
+                print("FOUND IN ROW", index)
+                self.focusROW = index
+                if wig.colEntry is self.root.focus_get():
+                    print("FOUND IN COL", 1)
+                    self.focusCOL = 1
+                if wig.rowEntry is self.root.focus_get():
+                    print("FOUND IN COL", 0)
+                    self.focusCOL = 0
 
     def view_image(self) -> None:
         if self.controlers:
