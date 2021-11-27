@@ -117,16 +117,16 @@ class Window:
             wig.colEntry.selection_range(0, tk.END)
 
     def _get_curent_focuss(self):
-        print("FOCUS: ", self.root.focus_get())
+        # print("FOCUS: ", self.root.focus_get())
         for index, wig in enumerate(self.controlers.values()):
             if wig.colEntry is self.root.focus_get() or wig.rowEntry is self.root.focus_get():
-                print("FOUND IN ROW", index)
+                # print("FOUND IN ROW", index)
                 self.focusROW = index
                 if wig.colEntry is self.root.focus_get():
-                    print("FOUND IN COL", 1)
+                    # print("FOUND IN COL", 1)
                     self.focusCOL = 1
                 if wig.rowEntry is self.root.focus_get():
-                    print("FOUND IN COL", 0)
+                    # print("FOUND IN COL", 0)
                     self.focusCOL = 0
 
     def view_image(self) -> None:
